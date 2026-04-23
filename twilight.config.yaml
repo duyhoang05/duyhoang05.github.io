@@ -1,0 +1,218 @@
+# 站点配置
+site:
+    siteURL: "https://duyhoang05.github.io/"
+    title: "Soobin Hoàng Đỗ"
+    subtitle: "Information Security • Blue Team • CTF"
+    lang: "vi"
+    translate:
+        enable: false
+    timeZone: 7 
+    font:
+        "Example - ZenMaruGothic":
+            src: "https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap"
+            family: "Zen Maru Gothic"
+    themeColor:
+        hue: 210
+    defaultTheme: "dark"
+    wallpaper:
+        mode: "fullscreen"
+        src:
+            desktop:
+                - "/assets/images/desktopWallpaper_1.jpg"
+                - "/assets/images/desktopWallpaper_2.jpg"
+                - "/assets/images/desktopWallpaper_3.jpg"
+            mobile:
+                - "/assets/images/mobileWallpaper_1.jpg"
+                - "/assets/images/mobileWallpaper_2.jpg"
+        position: "center"
+        carousel:
+            enable: true
+            interval: 3.6
+            kenBurns: true
+        banner:
+            homeText:
+                enable: true
+                title: "Soobin Hoang Do" 
+                subtitle: 
+                    - '"Don''t make promises you can''t keep." - "Yeah, but those are the best kind."'
+                typewriter:
+                    enable: false
+            credit:
+                enable: false
+                text: "Describe"
+                url: ""
+            navbar:
+                transparentMode: "semifull"
+        waves:
+            enable: true
+            performanceMode: false
+        fullscreen:
+            zIndex: -1
+            opacity: 0.9
+            blur: 1
+            navbar:
+                transparentMode: "semi"
+    loadingOverlay:
+        enable: true
+        waitForAllResources: true
+        title:
+            enable: true
+            content: "LOADING..."
+            interval: 1.5
+        spinner:
+            enable: true
+            interval: 1.5
+    favicon: []
+    bangumi:
+        userId: "your-bangumi-id"
+    generateOgImages: false
+
+# 统计配置
+analytics:
+    enabled: false
+    platform: "umami"
+    umami:
+        baseUrl: "https://api.umami.is"
+        apiKey: ''
+        code: ''
+
+# 导航栏配置
+# 导航栏配置
+navbar:
+    links:
+        - "Home"
+        - "Archive"
+        - "About"
+
+# 侧边栏配置
+sidebar:
+    components:
+        left:
+            - type: "profile"
+              position: "top"
+              visibility:
+                  mode: "exclude"
+                  paths: ["^/posts/", "^/archive"]
+            # Chỉ giữ lại phần categories (Danh mục) này
+            - type: "categories"
+              position: "sticky"
+              responsive:
+                  collapseThreshold: 5
+              depth: 3
+            - type: "tags"
+              position: "sticky"
+              responsive:
+                  collapseThreshold: 20
+        right:
+            - type: "announcement"
+              position: "top"
+              visibility:
+                  mode: "include"
+                  paths: ["^/$"]
+            - type: "toc"
+              position: "sticky"
+              depth: 3
+            - type: "statistics"
+              position: "sticky"
+              visibility:
+                  mode: "include"
+                  paths: ["^/$", "^/archive$"]
+
+# 资料配置
+profile:
+    avatar: "/assets/images/avatar.jpg" # Bạn hãy bỏ ảnh avatar của mình vào thư mục này nhé
+    name: "Duy Hoang"
+    bio: "Infosec Student | Blue Team Ops | CTF"
+    links:
+        - name: "GitHub"
+          icon: "fa6-brands:github"
+          url: "https://github.com/duyhoang05" # Cập nhật link Github của bạn
+        - name: "LinkedIn" 
+          icon: "fa6-brands:linkedin"
+          url: "https://www.linkedin.com/in/soobinhoangdo/" 
+
+# 公告配置
+announcement:
+    title: "Welcome!"
+    content: "Nơi tôi lưu trữ kiến thức chuyên ngành, write-up CTF và các dự án cá nhân."
+    closable: true
+    link:
+        enable: true
+        text: "Về tôi"
+        url: "/about/"
+        external: false
+
+# 文章配置
+post:
+    showLastModified: true
+    expressiveCode:
+        theme: "github-dark"
+    license:
+        enable: true
+        name: "CC BY-NC-SA 4.0"
+        url: "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    comment:
+        enable: false
+        twikoo:
+            envId: "https://twikoo.vercel.app"
+            lang: "vi"
+
+# 页脚配置
+footer:
+    enable: false
+    customHtml: ""
+
+# 粒子特效配置
+particle:
+    enable: true
+    particleNum: 12
+    limitTimes: -1
+    size:
+        min: 0.3
+        max: 0.9
+    opacity:
+        min: 0.3
+        max: 0.9
+    speed:
+        horizontal:
+            min: -0.9
+            max: 0.9
+        vertical:
+            min: 0.15
+            max: 0.3
+        rotation: 0.12
+        fadeSpeed: 0.12
+    zIndex: 100
+
+# 音乐播放器配置
+musicPlayer:
+    enable: false 
+    mode: "meting"
+    meting:
+        meting_api: "https://meting.spr-aachen.com/api"
+        server: "netease"
+        type: "playlist"
+        id: "2161912966"
+    local:
+        playlist: []
+    autoplay: false
+
+# 看板娘配置
+pio:
+    enable: false # Tắt nhân vật Live2D để giao diện blog thuần túy kỹ thuật
+    models:
+        - "/pio/models/pio/model.json"
+    position: "left"
+    width: 280
+    height: 250
+    mode: "draggable"
+    hiddenOnMobile: true
+    dialog:
+        welcome: "Welcome!"
+        touch:
+            - "What are you doing?"
+        home: "Click here to go back to homepage!"
+        skin:
+            - "Want to see my new outfit?"
+        close: "See you next time~"
+        link: "https://nav.kungal.org"
