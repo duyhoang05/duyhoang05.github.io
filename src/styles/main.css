@@ -698,3 +698,14 @@
 :root:not(.dark) .custom-md spoiler {
     --_spoiler-mask: color-mix(in oklch, var(--primary) 55%, white 45%);
 }
+
+/* Tối ưu hóa font chữ cho văn bản thường (sửa lỗi dấu nháy đơn) */
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Đổi bộ font cực xịn dành riêng cho code block và dấu backtick `...` */
+code, pre, kbd, samp {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Courier New', monospace !important;
+  font-size: 0.9em; /* Thu nhỏ một chút cho vừa mắt */
+}
