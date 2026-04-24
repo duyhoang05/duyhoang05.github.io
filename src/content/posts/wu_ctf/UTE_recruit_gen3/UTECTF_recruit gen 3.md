@@ -8,6 +8,12 @@ draft: false
 
 # Write-up – XÌ DÁCH ISC CASINO
 
+---
+ 
+Tác giả: soobinHoangDo
+
+Team: K2_2H
+
 ## 1. Tổng quan challenge
 
 ### Mô tả: 
