@@ -1,7 +1,7 @@
 ---
 title: CSCV2025
 published: 2025-10-24
-tags: [WU] [CTF]
+tags: [WU, CTF]
 category: Blog
 draft: false
 ---
