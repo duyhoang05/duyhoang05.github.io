@@ -1,7 +1,7 @@
 ---
 title: VCS Pass-port 2025
 published: 2025-12-21
-tags: [RE, Forensic, CTF]
+tags: [RE, Forensic, CTF, Malware]
 category: CTFs Write-up
 draft: false
 ---
