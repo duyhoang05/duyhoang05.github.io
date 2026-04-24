@@ -1,7 +1,7 @@
 ---
 title: CSCV2025
 published: 2025-10-24
-tags: [RE, FORENSIC, CTF]
+tags: [RE, Forensic, CTF]
 category: CTFs Write-up
 draft: false
 ---
