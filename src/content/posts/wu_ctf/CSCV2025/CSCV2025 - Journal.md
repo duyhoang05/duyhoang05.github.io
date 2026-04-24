@@ -1,8 +1,8 @@
 ---
 title: CSCV2025
 published: 2025-10-24
-tags: [WU, CTF]
-category: Blog
+tags: [RE, FORENSIC, CTF]
+category: CTFs Write-up
 draft: false
 ---
 
@@ -12,6 +12,7 @@ draft: false
  ---
  
 Tác giả: soobinHoangDo
+
 Team: K2_2H
 
 ![image](./screen1_CSCV.png)
