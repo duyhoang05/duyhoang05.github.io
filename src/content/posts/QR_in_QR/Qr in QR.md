@@ -149,12 +149,169 @@ Barracuda phát hiện hơn 500.000 email phishing nhúng QR trong PDF — thêm
 Gabagool PhaaS ra mắt Split QR (tách 2 ảnh). Tycoon 2FA triển khai Nested QR-in-QR. Đây là trọng tâm của bài nghiên cứu này.
 - **2026 — AI-powered Quishing**
 Tycoon 2FA bị triệt phá (3/2026). AI tự động hóa tạo nested QR cá nhân hóa. Quishing kết hợp deepfake audio/video. QR trong physical world (dán đè lên QR thật ở nhà hàng, ATM) mở rộng attack surface.
+---
+### 4.3 Phân tích kịch bản Quishing thực tế
+
+Để hình dung rõ hơn sự nguy hiểm của Quishing trong môi trường doanh nghiệp, chúng ta hãy cùng mổ xẻ một cảnh báo thực tế được ghi nhận trên hệ thống SIEM thông qua bài lab **SOC251** của nền tảng huấn luyện LetsDefend.
+
+![image.png](imagee.png)
+
+**Phân tích bề mặt cảnh báo (Alert Triage):**
+Từ thông tin Ticket hiển thị, một SOC Analyst cần ngay lập tức khoanh vùng các trường dữ liệu tĩnh để thiết lập không gian và thời gian của cuộc tấn công. Đây là bước sống còn để định hướng điều tra:
+
+- **Event Time:**  `Jan, 01, 2024, 12:37 PM`.
+- **Destination Address:** `Claire@letsdefend.io`.
+- **Source Address:** `security@microsecmfa.com`.
+- **SMTP Address (IP Nguồn):** `158.69.201.47`.
+- **E-mail Subject:** *"New Year's Mandatory Security Update: Implementing Multi-Factor Authentication (MFA)"*.
+- **Device Action:** `Allowed`.
+
+Tất cả những thông tin sau cần được ghi lại để tiến hành khám xét.
+
+#### Khởi chạy Playbook và Xác minh cảnh báo (Verify)
+
+Sau khi hoàn tất phân tích bề mặt, chuyên gia SOC không được phép hành động cảm tính mà phải bám sát theo một Sổ tay hướng dẫn xử lý sự cố (Incident Response Playbook / Handbook) đã được thiết kế sẵn cho kịch bản Phishing.
+
+![image.png](imagee1.png)
+
+Hệ thống hiển thị một thông điệp cảnh báo rất rõ ràng: *"Escalated alarms by Tier1 analysts are not always True Positive..."*. Điều này nhắc nhở Tier 2 Analyst rằng: Trước khi thực hiện các hành động can thiệp sâu (như block IP, cách ly máy tính), chúng ta bắt buộc phải đi tìm **IOC (Indicator of Compromise)** để chứng minh đây là một cuộc tấn công thật sự.
+
+Ngay sau khi xác nhận cần điều tra, Playbook yêu cầu SOC Analyst thực hiện một bước cực kỳ quan trọng: Kiểm tra dấu hiệu do thám mạng (Reconnaissance).
+
+![image.png](imagee2.png)
+
+**Tại sao phải làm bước này trong một ca lừa đảo qua email?**
+Trong các chiến dịch tấn công có chủ đích (APT), kẻ tấn công hiếm khi nhắm mắt gửi bừa. Chúng thường thực hiện scan hạ tầng mạng, tìm kiếm các cổng mở hoặc thu thập danh sách email trước khi thả payload. Việc kiểm tra bước này giúp SOC trả lời câu hỏi: *Đây là một email rác gửi hàng loạt hay một chiến dịch nhắm mục tiêu tinh vi?*
+
+Trên hệ thống SIEM, chúng ta chuyển sang công cụ **Log Management** và thực hiện truy vấn với địa chỉ IP nguồn của kẻ tấn công: `158.69.201.47`.
+Mục tiêu là tìm kiếm các kết nối mạng bất thường xuất phát từ IP này quét vào tường lửa hoặc máy chủ Web nội bộ trước mốc thời gian nhận email (12 : 37 PM).
+
+![image.png](imagee3.png)
+
+**Kết quả phân tích Log (Log Analysis Results):**
+Khi thực hiện truy vấn địa chỉ IP `158.69.201.47` trên công cụ Log Management, hệ thống chỉ trả về record duy nhất.
+
+Chi tiết bản ghi này cho thấy một bức tranh rất rõ ràng:
+
+- Chỉ có một luồng giao tiếp duy nhất nhắm vào cổng `25` .
+- Đích đến là máy chủ Email Exchange nội bộ của công ty (`172.16.20.3`).
+- Hoàn toàn vắng bóng các log chặn bắt từ Firewall liên quan đến rà quét cổng hay dò tìm lỗ hổng web từ dải IP này.
+
+**Kết luận:** Kẻ tấn công không hề đi dạo hay do thám hạ tầng mạng của chúng ta. Bọn chúng đã nhắm thẳng mục tiêu từ trước và thực hiện một đòn tấn công trực diện thông qua Phishing. Nút thắt của toàn bộ sự cố này nằm trọn vẹn bên trong nội dung bức thư.
+
+![image.png](d60f346c-da79-40fa-b05c-649eb5db062b.png)
+
+Sau khi loại trừ khả năng hệ thống bị rà quét từ bên ngoài, Playbook yêu cầu chúng ta tiến hành khám nghiệm hiện trường tại các kênh giao tiếp nội bộ, cụ thể là **Endpoint** và **Email Security**.
+
+Đầu tiên khi check mail thì ta chỉ thấy duy nhất 1 dòng chứa địa chỉ mail của attacker
+
+![image.png](image%204.png)
+
+Nhấn vô xem chi tiết ta có:
+
+![image.png](image%205.png)
+
+**Phân tích chiến thuật thao túng tâm lý:**
+Đọc lướt qua nội dung bức thư sẽ dễ dàng nhận ra ngay kịch bản lừa đảo qua 2 yếu tố:
+
+1. **Mạo danh uy tín:** Kẻ tấn công tự xưng là "The Microsoft team" kết hợp với tiêu đề "Multi Factor Authentication Setup" để tạo vỏ bọc hợp pháp.
+2. **Đe dọa và thúc ép:** Dòng chữ chí mạng *"Failure to authenticate the security information will lead to loss of email privileges"* (Không xác thực sẽ dẫn đến mất quyền sử dụng email). Lời đe dọa này đánh trúng điểm yếu tâm lý của nhân viên văn phòng, ép họ phải cầm điện thoại lên quét mã ngay lập tức mà bỏ qua mọi sự nghi ngờ.
+
+Vũ khí chính của kẻ tấn công là mã QR nằm chễm chệ giữa màn hình. Lúc này, nguyên tắc của mọi Blue Teamer được kích hoạt: **Tuyệt đối không sử dụng điện thoại cá nhân để quét các mã QR nghi ngờ trong quá trình điều tra.** Việc quét bằng camera cá nhân có thể khiến chính thiết bị của chuyên gia phân tích bị dính bẫy.
+
+Ta sử dụng những trình decode qr để tiến hành giải mã
+
+![image.png](image%206.png)
+
+**Kết quả giải mã (Decoded Payload):**
+Sau khi đưa bức ảnh qua công cụ phân tích tĩnh ta đã xác định được mã QR thực chất chứa một đường dẫn (URI):
+`https://ipfs.io/ipfs/Qmbr8wmr41C35c3K2GfiP2F8YGzLhYpKpb4K66KU6mLmL4#`
+
+Ta sử dụng virustotal để xem xét url trên
+
+![image.png](image%207.png)
+
+![image.png](image%208.png)
+
+Từ những thông tin trên ta có thể suy ra trang web mà qr code dẫn tới khi quét là 1 trang web phishing và máy chủ thực sự đang host trang phishing có địa chỉ IP là `209.94.90.1`.
+
+![image.png](image%209.png)
+
+Để chắc chắn, chúng ta tiếp tục đưa IP `209.94.90.1` lên VirusTotal. Kết quả có 10/91 vendor bảo mật đánh dấu IP này là Malicious/Phishing.
+
+Thử kiểm tra Log với địa chỉ web và địa chỉ ip mal trên trong Log thì không ghi nhận trường hợp nào. Có lẽ chỉ duy nhất mỗi Claire bị dính.
+
+Oke giờ qua kiểm tra endpoint
+
+![image.png](image%2010.png)
+
+Để củng cố kết luận với độ chắc chắn 100%, chúng ta tiến hành soi trực tiếp máy tính của nạn nhân thông qua module **Endpoint Security**.
+
+- Truy cập vào máy trạm `Claire` (IP: `172.16.17.181`).
+- Kiểm tra **Browser History**: Hoàn toàn không có dấu vết truy cập vào đường link IPFS lừa đảo.
+- Kiểm tra **Processes  & Terminal History**: Không có bất kỳ tiến trình lạ hay mã độc nào được thực thi.
+
+Có vẻ như Claire không hề mở URL phishing bằng máy tính công ty. Tuy nhiên, đây chính là sự nguy hiểm đáng sợ nhất của Quishing: **Nạn nhân thường dùng điện thoại di động cá nhân kết nối mạng 4g để quét mã.** Toàn bộ hành vi này nằm hoàn toàn ngoài vùng phủ sóng của các hệ thống giám sát mạng doanh nghiệp. Ta thực sự không thể biết chắc chắn liệu nạn nhân đã bị lừa nhập mật khẩu trên điện thoại hay chưa nếu chỉ nhìn vào log SIEM.
+
+Đứng trước điểm mù này, quy trình xử lý sự cố bắt buộc chúng ta phải hành động dứt khoát:
+
+Trên thực tế ta sẽ  gọi điện trực tiếp hoặc liên hệ qua kênh nội bộ an toàn với Claire để xác nhận tình trạng thao tác trên điện thoại cá nhân.
+
+**Cách ly phòng ngừa (Containment):** Trong lúc chờ xác nhận, để đề phòng rủi ro tin tặc đã lấy được phiên đăng nhập (Session Token) và chuẩn bị xâm nhập, tôi quyết định bật chế độ **Containment** đối với máy trạm của nạn nhân.
+
+![image.png](image%2011.png)
+
+**Tiêu hủy Payload:** Truy cập lại tab Email Security và thực thi lệnh Delete bức email mạo danh Microsoft, triệt tiêu hoàn toàn rủi ro lây lan.
+
+![image.png](image%2012.png)
+
+Tiếp theo Playbook yêu cầu chúng ta xác định kỹ thuật Do thám (Reconnaissance) mà kẻ tấn công đã sử dụng. Dựa trên toàn bộ quá trình phân tích, lựa chọn chính xác ở đây là **Phishing for Information (T1598)**.
+
+![image.png](image%2013.png)
+
+Hệ thống tiếp tục yêu cầu phân loại nguồn gốc của IP tấn công. Với địa chỉ ``158.69.201.47`` thu thập được từ Header của email, đây rõ ràng là một Public IP được định tuyến trên Internet.
+
+![image.png](image%2014.png)
+
+Như chúng ta đã phân tích từ trước, địa chỉ IP ``158.69.201.47`` là nguồn trực tiếp phát tán email lừa đảo. Khi đối chiếu chéo IP này trên các nền tảng tình báo mối đe dọa như VirusTotal nó bị cộng đồng gắn cờ đe với các dấu hiệu của hành vi Spam/Phishing.
+
+![image.png](image%2015.png)
+
+Trong môi trường doanh nghiệp thực tế, khi phát hiện một email lừa đảo, câu hỏi lớn nhất của đội ngũ SOC là: *"Liệu kẻ tấn công có gửi email này cho hàng loạt nhân viên khác không?"*.
+
+Dựa vào các kết quả truy vấn IOC trên hệ thống:
+
+- **Email Security:** Chỉ ghi nhận duy nhất một email độc hại gửi đến hòm thư của Claire. Không có chiến dịch phát tán diện rộng nào khác.
+- **Log Management & Endpoint Security:** Hoàn toàn trống trơn, không có bất kỳ thiết bị nào trong công ty kết nối đến`209.94.90.1`.
+
+Do đó, chúng ta tự tin kết luận rằng phạm vi ảnh hưởng của cuộc tấn công này rất hẹp, và không có thiết bị nào khác trong hệ thống bị đe dọa.
+
+![image.png](image%2016.png)
+
+Tiếp tục theo sát Playbook, hệ thống đặt ra một câu hỏi định đoạt: *"Thiết bị có cần được cách ly để giảm thiểu hậu quả của cuộc tấn công không?".* Ta đã cách ly trước đó !!
+
+![image.png](image%2017.png)
+
+Bước cuối cùng và mang lại giá trị dài hạn nhất cho doanh nghiệp chính là trả lời các câu hỏi trong bảng **Lesson Learned**.
+
+- Cuộc tấn công đã xảy ra như thế nào? (How did it happen?)
+- Nhân sự và hệ thống đã phản ứng ra sao? (Performance & Response)
+- Hành động khắc phục để ngăn chặn trong tương lai? (Corrective Actions)
+- Cần theo dõi các Dấu hiệu (Indicators) nào trong tương lai?
+
+![image.png](image%2018.png)
+
+Oke đóng alert với lựa chọn “True Positive” thôi
+
+![image.png](image%2019.png)
+
+Vậy là ta đã hoàn thành bài lab. Qua bài trên ta có thể thấy việc endpoint là thiết bị điện thoại cá nhân của nạn nhân sẽ gây ra rất nhiều khó khăn cho các nhà phân tích SOC vì không hề ghi lại log, qua đó ta cần hết sức cẩn thận với các thủ đoạn QR phishing.
 
 ---
 
 ## 5. Kỹ thuật QR-in-QR (Nested QR Code)
 
-Đây là kỹ thuật trọng tâm của nghiên cứu: **nhúng một mã QR độc hại bên trong hoặc xung quanh một mã QR hợp lệ**, tạo ra sự mơ hồ lừa được cả hệ thống bảo mật lẫn người dùng. Kỹ thuật này được xác nhận do **Tycoon 2FA PhaaS** triển khai trong thực tế.
+Oke với bài lab trước đó ta đã thấy nạn nhân nhận được mail chứa mã QR độc hại, nhưng thực tế hầu hết hệ thống mail sẽ scan ảnh QR trước nếu độc hại sẽ báo ngay và block ngay lập tức. Để bypass qua nó thì ta sẽ đến với kỹ thuật: **nhúng một mã QR độc hại bên trong hoặc xung quanh một mã QR hợp lệ**, tạo ra sự mơ hồ lừa được cả hệ thống bảo mật lẫn người dùng. Kỹ thuật này được xác nhận do **Tycoon 2FA PhaaS** triển khai trong thực tế.
 
 ![image.png](image%201.png)
 
@@ -255,7 +412,7 @@ if __name__ == "__main__":
 Khi chạy script trên, hệ thống sẽ tự động tính toán tỷ lệ diện tích che khuất để đảm bảo không vượt quá ngưỡng 30% làm hỏng mã định vị. Kết quả, chúng ta thu được bức ảnh `nested_qr_poc.png` như sau:
 ![image.png](./image4.png)
 
-### 5.5.2. Kiểm thử thực tế (The Twin Test)
+### 5.5.2. Kiểm thử thực tế
 
 Đây là lúc điều kỳ diệu (và đáng sợ) xảy ra. Cùng một bức ảnh, nhưng lại cho ra hai góc nhìn khác nhau.
 
@@ -547,20 +704,9 @@ Kể cả khi nạn nhân bị lừa vào trang phishing hoàn hảo — giao di
 
 Đọc thêm tại: [https://www.sophos.com/en-us/blog/strengthening-authentication-with-passkeys-a-ciso-playbook](https://www.sophos.com/en-us/blog/strengthening-authentication-with-passkeys-a-ciso-playbook)
 
-## 10. Giải pháp con người và quy trình
-
-**Đào tạo nhận thức QR-specific**
-Đào tạo tập trung vào QR phishing cải thiện tỷ lệ phát hiện lên **87% trong 3 tháng**. Nội dung cốt lõi: không quét QR từ email chưa xác minh, nhận biết urgency tactic, báo cáo ngay khi nghi ngờ.
-
-> Keepnet Labs (2025) ghi nhận chương trình đào tạo tập trung vào QR phishing cải thiện tỷ lệ phát hiện của nhân viên lên **87% trong vòng 3 tháng** — [keepnetlabs.com](https://keepnetlabs.com/blog/qr-code-phishing-trends-in-depth-analysis-of-rising-quishing-statistics)
-> 
-
-**Chính sách "Không quét QR từ email"**
-Bất kỳ QR nào nhận qua email phải xác minh qua kênh liên lạc riêng (điện thoại, Slack nội bộ) trước khi quét. Không có ngoại lệ — kể cả email trông như từ Microsoft hay DocuSign.
-
 ---
 
-## 11. Kết luận và xu hướng 2026
+## 10. Kết luận và xu hướng 2026
 
 ### Ý nghĩa chiến lược
 
