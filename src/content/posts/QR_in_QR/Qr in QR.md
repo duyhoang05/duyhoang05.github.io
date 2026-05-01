@@ -336,9 +336,13 @@ Outer QR (độc hại) + Inner QR (hợp lệ → google.com) = một ảnh duy
 
 **Camera điện thoại:** 
 
-- Nhận diện Bounding Box: Camera smartphone hiện đại (dùng Apple Vision hoặc Google ML Kit) không quét từng dòng pixel rập khuôn. AI phân tích toàn bộ khung hình, nhận diện 3 khối vuông lớn nhất ở rìa ngoài và lập tức vẽ một Bounding Box (khung giới hạn) bao trọn Outer QR làm mục tiêu chính.
+Khác với quét tĩnh, điện thoại có thể phát hiện cả 2 qr code, qr nào được phát hiện sẽ phụ thuộc vào: Khoảng cách vật lý, Mật độ điểm ảnh (PPM - pixels per module) và vùng xử lý (Region of Interest – ROI). Các ứng dụng quét mã thường sẽ hiển thị sẵn một khung vuông định hướng trên màn hình và theo phản xạ, người dùng sẽ tự động lùi điện thoại ra xa để canh cho toàn bộ mã lớn (Outer QR) lọt vừa vặn vào bên trong khung vuông này.
 
-- Cơ chế sửa lỗi Reed-Solomon (ECC Level H): AI đọc dải bit cấu hình tĩnh (Format Information) nằm sát các ô định vị ở rìa ngoài và biết được Outer QR này mang chuẩn sửa lỗi ECC Level H. Khi nhìn thấy Inner QR, hệ thống coi đó chỉ là một cục nhiễu phá vỡ lưới dữ liệu. Ngay lập tức, vi xử lý kích hoạt mức sửa lỗi phần cứng cao nhất (ECC Level H), sử dụng nội suy toán học để tự động khôi phục lên đến 30% diện tích bị thủng ở trung tâm. Nhờ đó, nó đọc trót lọt URL Phishing của Outer QR.
+- Ở khoảng cách xa mã inner QR bị thu bé lại, các điểm định vị của nó mờ nhạt và rơi xuống dưới ngưỡng điểm ảnh tối thiểu để thuật toán có thể nhận diện. Điện thoại sẽ focus vào 3 Finder Pattern khổng lồ của Outer QR vẫn đủ to và sắc nét. Toàn bộ Outer QR nằm trọn trong vùng xử lý, trở thành mục tiêu hợp lệ duy nhất để thuật toán tiến hành trích xuất dữ liệu. Lúc này, thuật toán sẽ kích hoạt cơ chế sửa lỗi (ECC Level H) để tự động vá lại vùng dữ liệu bị Inner QR che khuất ở trung tâm, qua đó trích xuất trót lọt URL Phishing.
+
+- Ở khoảng cách gần 3 điểm định vị của outer QR lập tức bị đẩy văng ra khỏi rìa camera hoặc out khỏi khung hình, lúc này điện thoại sẽ focus vào Inner QR có độ nét tốt hơn và giải mã ra an toàn.
+
+- Lưu ý: khi đưa điện thoại ở 1 khoảng cách không quá xa cũng không quá gần thì điện thoại sẽ bắt được cả 2 mã cùng lúc tùy thuộc vào dòng sản phẩm, app sử dụng mà nó sẽ hiện thị cái nào trước hoặc cả 2 cùng lúc. Tuy nhiên phần lớn chúng ta sẽ đưa cái khung vuông định hướng khi quét mã trên màn hình khớp với cả qr to, hiếm khi ta dí sát điện thoại vào để quét nên đó là lý do kỹ thuật này vẫn có tỉ lệ thành công rất cao.
 
 ### 5.3 Luồng tấn công từng bước
 
