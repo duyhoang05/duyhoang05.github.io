@@ -129,7 +129,7 @@ profile:
           url: "https://github.com/duyhoang05" # Cập nhật link Github của bạn
         - name: "LinkedIn" 
           icon: "fa6-brands:linkedin"
-          url: "https://www.linkedin.com/in/soobinhoangdo/" 
+          url: "https://www.linkedin.com/in/dodoanduyhoang/" 
 
 # 公告配置
 announcement:
