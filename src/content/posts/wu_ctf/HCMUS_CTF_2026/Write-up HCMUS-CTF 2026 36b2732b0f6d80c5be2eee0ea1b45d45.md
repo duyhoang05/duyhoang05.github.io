@@ -3,7 +3,7 @@ title: Write-up HCMUS_CTF_2026
 published: 2026-05-30
 tags: [RE, Forensic, CTF]
 category: CTFs Write-up
-draft: false
+draft: true
 ---
 
 # Write-up HCMUS-CTF 2026
